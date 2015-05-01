@@ -1,4 +1,5 @@
+// reset some CSS
+document.body.style.padding = 0;
+document.body.style.margin = 0;
 
-var raf = require('raf');
-
-console.log('hallo werld');
+require('./src/main.js');
