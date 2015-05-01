@@ -6,6 +6,8 @@ var b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
 var M_TO_PX = 6.4;
 
 function StageView(stage) {
+    this.stage = stage;
+
     var debugDrawCanvas = document.createElement('canvas');
     debugDrawCanvas.width = 640;
     debugDrawCanvas.height = 480;
@@ -22,9 +24,11 @@ function StageView(stage) {
     debugDraw.SetFillAlpha(0.3);
     debugDraw.SetLineThickness(1.0);
     debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit | b2DebugDraw.e_centerOfMassBit);
-    stage.world.SetDebugDraw(debugDraw);
-
-    stage.world.DrawDebugData();
+    this.stage.world.SetDebugDraw(debugDraw);
 }
+
+StageView.prototype.render = function () {
+    this.stage.world.DrawDebugData();
+};
 
 module.exports = StageView;

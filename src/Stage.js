@@ -14,7 +14,7 @@ var STEP_DURATION = 1 / 60.0;
 
 function Stage() {
     this.timeAccumulator = 0;
-    this.world = new b2World(new b2Vec2(0, 0), true);
+    this.world = new b2World(new b2Vec2(0.1, 0), true);
 
     var fixDef = new b2FixtureDef();
     fixDef.density = 1.0;
@@ -31,5 +31,14 @@ function Stage() {
     this.testBody = this.world.CreateBody(bodyDef);
     this.testBody.CreateFixture(fixDef);
 }
+
+Stage.prototype.applyTime = function (secondsElapsed) {
+    this.timeAccumulator += secondsElapsed;
+
+    while (this.timeAccumulator > 0) {
+        this.timeAccumulator -= STEP_DURATION;
+        this.world.Step(STEP_DURATION, 10, 10);
+    }
+};
 
 module.exports = Stage;
