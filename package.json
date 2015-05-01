@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "box2dweb": "^2.1.0-b",
     "raf": "^2.0.4",
     "stats.js": "git://github.com/mrdoob/stats.js.git"
   },

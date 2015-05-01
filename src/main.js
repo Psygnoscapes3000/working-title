@@ -12,4 +12,3 @@ document.body.appendChild(stats.domElement);
 
 var stage = new Stage();
 var view = new StageView(stage);
-
