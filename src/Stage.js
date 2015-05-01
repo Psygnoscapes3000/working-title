@@ -14,7 +14,7 @@ var STEP_DURATION = 1 / 60.0;
 
 function Stage() {
     this.timeAccumulator = 0;
-    this.world = new b2World(new b2Vec2(0.1, 0), true);
+    this.world = new b2World(new b2Vec2(0, 0), true);
 
     var fixDef = new b2FixtureDef();
     fixDef.density = 1.0;
@@ -26,13 +26,12 @@ function Stage() {
     bodyDef.type = b2Body.b2_dynamicBody;
     bodyDef.position.x = 10;
     bodyDef.position.y = 10;
-    bodyDef.linearDamping = 1;
 
     this.testBody = this.world.CreateBody(bodyDef);
     this.testBody.CreateFixture(fixDef);
 }
 
-Stage.prototype.applyTime = function (secondsElapsed) {
+Stage.prototype.advanceTime = function (secondsElapsed) {
     this.timeAccumulator += secondsElapsed;
 
     while (this.timeAccumulator > 0) {

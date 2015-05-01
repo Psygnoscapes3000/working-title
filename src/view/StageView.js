@@ -25,9 +25,12 @@ function StageView(stage) {
     debugDraw.SetLineThickness(1.0);
     debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit | b2DebugDraw.e_centerOfMassBit);
     this.stage.world.SetDebugDraw(debugDraw);
+
+    this.debugDrawCanvasContext = debugDrawCanvasContext;
 }
 
 StageView.prototype.render = function () {
+    this.debugDrawCanvasContext.clearRect(0, -240, 640, 240);
     this.stage.world.DrawDebugData();
 };
 

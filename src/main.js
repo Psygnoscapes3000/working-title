@@ -18,11 +18,11 @@ requestAnimationFrame(function () {
     stats.begin();
 
     var time = performance.now(),
-        elapsed = Math.min(0.1, time - lastTime); // limit to 100ms jitter
+        elapsedSeconds = Math.min(100, time - lastTime) / 1000; // limit to 100ms jitter
 
     lastTime = time;
 
-    stage.applyTime(elapsed);
+    stage.advanceTime(elapsedSeconds);
     view.render();
 
     stats.end();
