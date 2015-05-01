@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "raf": "^2.0.4"
+    "raf": "^2.0.4",
+    "stats.js": "git://github.com/mrdoob/stats.js.git"
   },
   "repository": {
     "type": "git",
