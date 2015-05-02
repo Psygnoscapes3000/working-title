@@ -29,14 +29,33 @@ function Stage() {
 
     this.testBody = this.world.CreateBody(bodyDef);
     this.testBody.CreateFixture(fixDef);
+
+    var anchorDef = new b2BodyDef();
+    anchorDef.type = b2Body.b2_staticBody;
+    anchorDef.position.x = 0;
+    anchorDef.position.y = 0;
+
+    this.anchor = this.world.CreateBody(anchorDef);
+
+    var jDef = new b2MouseJointDef();
+
+    jDef.bodyA = this.anchor;
+    jDef.bodyB = this.testBody;
+    jDef.target = new b2Vec2(bodyDef.position.x, bodyDef.position.y);
+
+    jDef.maxForce = 0;
+    jDef.dampingRatio = 0.8;
+
+    this.joint = this.world.CreateJoint(jDef);
 }
 
 Stage.prototype.setTarget = function (x, y) {
-    console.log(x, y);
+    this.joint.SetMaxForce(200);
+    this.joint.SetTarget(new b2Vec2(x, y));
 };
 
 Stage.prototype.clearTarget = function () {
-    console.log('up');
+    this.joint.SetMaxForce(0);
 };
 
 Stage.prototype.advanceTime = function (secondsElapsed) {
