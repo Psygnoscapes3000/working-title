@@ -34,8 +34,22 @@ function StageView(stage) {
     var isMouseDown = false;
 
     debugDrawCanvas.onmousedown = function (e) {
+        e.preventDefault();
+
         isMouseDown = true;
         this.stage.setTarget(e.pageX / M_TO_PX, (e.pageY - debugDrawCanvas.height / 2) / M_TO_PX);
+
+        return false;
+    }.bind(this);
+
+    debugDrawCanvas.onmousemove = function (e) {
+        e.preventDefault();
+
+        if (isMouseDown) {
+            this.stage.setTarget(e.pageX / M_TO_PX, (e.pageY - debugDrawCanvas.height / 2) / M_TO_PX);
+        }
+
+        return false;
     }.bind(this);
 
     document.onmouseup = function (e) {
