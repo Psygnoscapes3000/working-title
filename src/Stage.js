@@ -17,25 +17,68 @@ function Stage() {
     this.timeAccumulator = 0;
     this.world = new b2World(new b2Vec2(0, 0), true);
 
-    var wallFixDef = new b2FixtureDef();
-    wallFixDef.shape = new b2PolygonShape();
-    wallFixDef.shape.SetAsArray([
-        new b2Vec2(-1, 20),
-        new b2Vec2(25, 18),
-        new b2Vec2(50, 17),
-        new b2Vec2(75, 18),
-        new b2Vec2(101, 20),
-        new b2Vec2(101, 101),
-        new b2Vec2(-1, 101)
-    ]);
+    var walls = [
+        [{
+            x: -1, y: 20
+        }, {
+            x: 25, y: 18
+        }, {
+            x: 50, y: 17
+        }, {
+            x: 75, y: 18
+        }, {
+            x: 101, y: 20
+        }, {
+            x: 101, y: 101
+        }, {
+            x: -1, y: 101
+        }],
+        [{
+            x: -1, y: -20
+        }, {
+            x: -1, y: -101
+        }, {
+            x: 101, y: -101
+        }, {
+            x: 101, y: -20
+        }, {
+            x: 75, y: -18
+        }, {
+            x: 50, y: -17
+        }, {
+            x: 25, y: -18
+        }],
+        [{
+            x: 25, y: 10
+        }, {
+            x: 25, y: -10
+        }, {
+            x: 60, y: 10
+        }],
+        [{
+            x: 75, y: 10
+        }, {
+            x: 40, y: -10
+        }, {
+            x: 75, y: -10
+        }]
+    ];
 
-    var wallBodyDef = new b2BodyDef();
-    wallBodyDef.type = b2Body.b2_staticBody;
-    wallBodyDef.position.x = 0;
-    wallBodyDef.position.y = 0;
+    walls.forEach(function (vertices) {
+        var wallFixDef = new b2FixtureDef();
+        wallFixDef.shape = new b2PolygonShape();
+        wallFixDef.shape.SetAsArray(vertices.map(function (vertex) {
+            return new b2Vec2(vertex.x, vertex.y);
+        }));
 
-    var wallBody = this.world.CreateBody(wallBodyDef);
-    wallBody.CreateFixture(wallFixDef);
+        var wallBodyDef = new b2BodyDef();
+        wallBodyDef.type = b2Body.b2_staticBody;
+        wallBodyDef.position.x = 0;
+        wallBodyDef.position.y = 0;
+
+        var wallBody = this.world.CreateBody(wallBodyDef);
+        wallBody.CreateFixture(wallFixDef);
+    }, this);
 
     var fixDef = new b2FixtureDef();
     fixDef.density = 1.0;
@@ -46,7 +89,7 @@ function Stage() {
     var bodyDef = new b2BodyDef();
     bodyDef.type = b2Body.b2_dynamicBody;
     bodyDef.position.x = 10;
-    bodyDef.position.y = 10;
+    bodyDef.position.y = 0;
 
     this.testBody = this.world.CreateBody(bodyDef);
     this.testBody.CreateFixture(fixDef);
