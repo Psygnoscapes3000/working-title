@@ -138,6 +138,12 @@ Stage.prototype.clearTarget = function () {
 };
 
 Stage.prototype.advanceTime = function (secondsElapsed) {
+    // turret AI
+    this.turrets.forEach(function (turret) {
+        turret.advanceTime(secondsElapsed);
+    });
+
+    // update physics
     this.timeAccumulator += secondsElapsed;
 
     while (this.timeAccumulator > 0) {
