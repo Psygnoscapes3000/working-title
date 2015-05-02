@@ -5,6 +5,8 @@ var Stage = require('./Stage.js');
 var StageView = require('./view/StageView.js');
 
 var stats = new Stats();
+stats.domElement.style.position = 'absolute';
+stats.domElement.style.zIndex = 2;
 document.body.appendChild(stats.domElement);
 
 var stage = new Stage();
