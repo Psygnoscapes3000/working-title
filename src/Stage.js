@@ -108,15 +108,19 @@ function Stage(onEnd) {
         new Turret(this.world, 55, 25)
     ];
 
-    this.critter = new Critter(this.world, this.anchor, 10, 0);
-
     this.currentTick = 0;
-    this.actionList = [];
-    this.nextActionIndex = 0;
+
+    this.critterList = [];
+    this.actionQueueList = [];
+    this.nextActionIndexList = [];
+
+    this.critterList.push(new Critter(this.world, this.anchor, 10, 0));
+    this.actionQueueList.push([]);
+    this.nextActionIndexList.push(0);
 }
 
 Stage.prototype.setTarget = function (x, y) {
-    this.actionList.push({ tick: this.currentTick, x: x, y: y });
+    this.actionQueueList[0].push({ tick: this.currentTick, x: x, y: y });
 };
 
 Stage.prototype.clearTarget = function () {
@@ -134,22 +138,24 @@ Stage.prototype.advanceTime = function (secondsElapsed) {
     while (this.timeAccumulator > 0) {
         this.timeAccumulator -= STEP_DURATION;
 
-        if (this.nextActionIndex < this.actionList.length) {
-            var action = this.actionList[this.nextActionIndex];
-            if (action.tick >= this.currentTick) {
-                this.critter.setTarget(action.x, action.y);
-                this.nextActionIndex += 1;
+        this.critterList.forEach(function (critter, i) {
+            if (this.nextActionIndexList[i] < this.actionQueueList[i].length) {
+                var action = this.actionQueueList[i][this.nextActionIndexList[i]];
+                if (action.tick >= this.currentTick) {
+                    this.critterList[i].setTarget(action.x, action.y);
+                    this.nextActionIndexList[i] += 1;
+                }
             }
-        }
+        }, this);
 
         this.world.Step(STEP_DURATION, 10, 10);
 
         this.currentTick += 1;
 
         // check end condition
-        var tpos = this.critter.body.GetPosition();
+        var tpos = this.critterList[0].body.GetPosition();
         if (tpos.x > 100) {
-            this.onEnd();
+            this.onEnd(this.actionQueueList[0]);
             return;
         }
     }

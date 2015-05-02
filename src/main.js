@@ -16,7 +16,8 @@ function restartStage() {
         view.dispose();
     }
 
-    stage = new Stage(function () {
+    stage = new Stage(function (recordedActionList) {
+        console.log(recordedActionList);
         restartStage();
     });
 
