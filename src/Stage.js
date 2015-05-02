@@ -31,6 +31,14 @@ function Stage() {
     this.testBody.CreateFixture(fixDef);
 }
 
+Stage.prototype.setTarget = function (x, y) {
+    console.log(x, y);
+};
+
+Stage.prototype.clearTarget = function () {
+    console.log('up');
+};
+
 Stage.prototype.advanceTime = function (secondsElapsed) {
     this.timeAccumulator += secondsElapsed;
 

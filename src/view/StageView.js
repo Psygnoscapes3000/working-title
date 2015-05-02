@@ -30,6 +30,20 @@ function StageView(stage) {
     this.stage.world.SetDebugDraw(debugDraw);
 
     this.debugDrawCanvasContext = debugDrawCanvasContext;
+
+    var isMouseDown = false;
+
+    debugDrawCanvas.onmousedown = function (e) {
+        isMouseDown = true;
+        this.stage.setTarget(e.pageX / M_TO_PX, (e.pageY - debugDrawCanvas.height / 2) / M_TO_PX);
+    }.bind(this);
+
+    document.onmouseup = function (e) {
+        if (isMouseDown) {
+            isMouseDown = false;
+            this.stage.clearTarget();
+        }
+    }.bind(this);
 }
 
 StageView.prototype.render = function () {
