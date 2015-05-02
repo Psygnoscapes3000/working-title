@@ -11,7 +11,10 @@ function StageView(stage) {
     var debugDrawCanvas = document.createElement('canvas');
     debugDrawCanvas.width = 640;
     debugDrawCanvas.height = 480;
-    debugDrawCanvas.style.border = "1px solid black";
+    debugDrawCanvas.style.position = 'absolute';
+    debugDrawCanvas.style.left = 0;
+    debugDrawCanvas.style.top = 0;
+    debugDrawCanvas.style.background = '#e0e0e0';
     document.body.appendChild(debugDrawCanvas);
 
     var debugDrawCanvasContext = debugDrawCanvas.getContext("2d");
@@ -27,6 +30,34 @@ function StageView(stage) {
     this.stage.world.SetDebugDraw(debugDraw);
 
     this.debugDrawCanvasContext = debugDrawCanvasContext;
+
+    var isMouseDown = false;
+
+    debugDrawCanvas.onmousedown = function (e) {
+        e.preventDefault();
+
+        isMouseDown = true;
+        this.stage.setTarget(e.pageX / M_TO_PX, (debugDrawCanvas.height / 2 - e.pageY) / M_TO_PX);
+
+        return false;
+    }.bind(this);
+
+    debugDrawCanvas.onmousemove = function (e) {
+        e.preventDefault();
+
+        if (isMouseDown) {
+            this.stage.setTarget(e.pageX / M_TO_PX, (debugDrawCanvas.height / 2 - e.pageY) / M_TO_PX);
+        }
+
+        return false;
+    }.bind(this);
+
+    document.onmouseup = function (e) {
+        if (isMouseDown) {
+            isMouseDown = false;
+            this.stage.clearTarget();
+        }
+    }.bind(this);
 }
 
 StageView.prototype.render = function () {
