@@ -9,8 +9,21 @@ stats.domElement.style.position = 'absolute';
 stats.domElement.style.zIndex = 2;
 document.body.appendChild(stats.domElement);
 
-var stage = new Stage();
-var view = new StageView(stage);
+var stage, view;
+
+function restartStage() {
+    if (view) {
+        view.dispose();
+    }
+
+    stage = new Stage(function () {
+        restartStage();
+    });
+
+    view = new StageView(stage);
+}
+
+restartStage();
 
 var lastTime = performance.now();
 

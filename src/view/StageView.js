@@ -17,6 +17,8 @@ function StageView(stage) {
     debugDrawCanvas.style.background = '#e0e0e0';
     document.body.appendChild(debugDrawCanvas);
 
+    this.canvas = debugDrawCanvas;
+
     var debugDrawCanvasContext = debugDrawCanvas.getContext("2d");
     debugDrawCanvasContext.translate(0, debugDrawCanvas.height / 2);
     debugDrawCanvasContext.scale(1, -1);
@@ -63,6 +65,11 @@ function StageView(stage) {
 StageView.prototype.render = function () {
     this.debugDrawCanvasContext.clearRect(0, -240, 640, 240);
     this.stage.world.DrawDebugData();
+};
+
+StageView.prototype.dispose = function () {
+    this.canvas.parentNode.removeChild(this.canvas);
+    document.onmouseup = null;
 };
 
 module.exports = StageView;

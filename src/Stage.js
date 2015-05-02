@@ -16,9 +16,10 @@ var STEP_DURATION = 1 / 60.0;
 var Critter = require('./Critter.js');
 var Turret = require('./Turret.js');
 
-function Stage() {
+function Stage(onEnd) {
     this.timeAccumulator = 0;
     this.world = new b2World(new b2Vec2(0, 0), true);
+    this.onEnd = onEnd;
 
     var listener = {
         BeginContact: function (contact) {
@@ -130,6 +131,12 @@ Stage.prototype.advanceTime = function (secondsElapsed) {
     while (this.timeAccumulator > 0) {
         this.timeAccumulator -= STEP_DURATION;
         this.world.Step(STEP_DURATION, 10, 10);
+
+        var tpos = this.critter.body.GetPosition();
+        if (tpos.x > 100) {
+            this.onEnd();
+            return;
+        }
     }
 };
 
