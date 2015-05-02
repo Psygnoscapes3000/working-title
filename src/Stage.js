@@ -160,7 +160,7 @@ Stage.prototype.advanceTime = function (secondsElapsed) {
 
         // check end condition
         var tpos = this.critterList[0].body.GetPosition();
-        if (tpos.x > 100) {
+        if (tpos.x > 80) {
             this.onEnd(this.actionQueueList[0]);
             return;
         }
