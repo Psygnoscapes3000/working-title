@@ -10,13 +10,15 @@ stats.domElement.style.zIndex = 2;
 document.body.appendChild(stats.domElement);
 
 var stage, view;
+var recordedActionQueueList = [];
 
 function restartStage() {
     if (view) {
         view.dispose();
     }
 
-    stage = new Stage(function () {
+    stage = new Stage(recordedActionQueueList, function (recordedActionList) {
+        recordedActionQueueList.push(recordedActionList);
         restartStage();
     });
 

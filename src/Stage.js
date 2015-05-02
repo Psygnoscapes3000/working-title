@@ -16,7 +16,7 @@ var STEP_DURATION = 1 / 60.0;
 var Critter = require('./Critter.js');
 var Turret = require('./Turret.js');
 
-function Stage(onEnd) {
+function Stage(priorActionQueueList, onEnd) {
     this.timeAccumulator = 0;
     this.world = new b2World(new b2Vec2(0, 0), true);
     this.onEnd = onEnd;
@@ -108,15 +108,28 @@ function Stage(onEnd) {
         new Turret(this.world, 55, 25)
     ];
 
-    this.critter = new Critter(this.world, this.anchor, 10, 0);
+    this.currentTick = 0;
+
+    this.critterList = [];
+    this.actionQueueList = [];
+    this.nextActionIndexList = [];
+
+    this.critterList.push(new Critter(this.world, this.anchor, 10 * priorActionQueueList.length, 0));
+    this.actionQueueList.push([]);
+    this.nextActionIndexList.push(0);
+
+    priorActionQueueList.forEach(function (list, i) {
+        this.critterList.push(new Critter(this.world, this.anchor, 10 * i, 0));
+        this.actionQueueList.push(list);
+        this.nextActionIndexList.push(0);
+    }, this);
 }
 
 Stage.prototype.setTarget = function (x, y) {
-    this.critter.setTarget(x, y);
+    this.actionQueueList[0].push({ tick: this.currentTick, x: x, y: y });
 };
 
 Stage.prototype.clearTarget = function () {
-    this.critter.clearTarget();
 };
 
 Stage.prototype.advanceTime = function (secondsElapsed) {
@@ -130,11 +143,25 @@ Stage.prototype.advanceTime = function (secondsElapsed) {
 
     while (this.timeAccumulator > 0) {
         this.timeAccumulator -= STEP_DURATION;
+
+        this.critterList.forEach(function (critter, i) {
+            if (this.nextActionIndexList[i] < this.actionQueueList[i].length) {
+                var action = this.actionQueueList[i][this.nextActionIndexList[i]];
+                if (action.tick <= this.currentTick) {
+                    this.critterList[i].setTarget(action.x, action.y);
+                    this.nextActionIndexList[i] += 1;
+                }
+            }
+        }, this);
+
         this.world.Step(STEP_DURATION, 10, 10);
 
-        var tpos = this.critter.body.GetPosition();
+        this.currentTick += 1;
+
+        // check end condition
+        var tpos = this.critterList[0].body.GetPosition();
         if (tpos.x > 100) {
-            this.onEnd();
+            this.onEnd(this.actionQueueList[0]);
             return;
         }
     }
