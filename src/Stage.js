@@ -9,12 +9,33 @@ var b2Body = Box2D.Dynamics.b2Body;
 var b2BodyDef = Box2D.Dynamics.b2BodyDef;
 var b2MouseJointDef = Box2D.Dynamics.Joints.b2MouseJointDef;
 var b2CircleShape = Box2D.Collision.Shapes.b2CircleShape;
+var b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape;
 
 var STEP_DURATION = 1 / 60.0;
 
 function Stage() {
     this.timeAccumulator = 0;
     this.world = new b2World(new b2Vec2(0, 0), true);
+
+    var wallFixDef = new b2FixtureDef();
+    wallFixDef.shape = new b2PolygonShape();
+    wallFixDef.shape.SetAsArray([
+        new b2Vec2(-1, 20),
+        new b2Vec2(25, 18),
+        new b2Vec2(50, 17),
+        new b2Vec2(75, 18),
+        new b2Vec2(101, 20),
+        new b2Vec2(101, 101),
+        new b2Vec2(-1, 101)
+    ]);
+
+    var wallBodyDef = new b2BodyDef();
+    wallBodyDef.type = b2Body.b2_staticBody;
+    wallBodyDef.position.x = 0;
+    wallBodyDef.position.y = 0;
+
+    var wallBody = this.world.CreateBody(wallBodyDef);
+    wallBody.CreateFixture(wallFixDef);
 
     var fixDef = new b2FixtureDef();
     fixDef.density = 1.0;
