@@ -13,9 +13,42 @@ var b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape;
 
 var STEP_DURATION = 1 / 60.0;
 
+var Turret = require('./Turret.js');
+
 function Stage() {
     this.timeAccumulator = 0;
     this.world = new b2World(new b2Vec2(0, 0), true);
+
+    var listener = {
+        BeginContact: function (contact) {
+            var a = contact.GetFixtureA().GetBody().GetUserData();
+            var b = contact.GetFixtureB().GetBody().GetUserData();
+
+            if (a && b) {
+                if (a.iCanHasTurret) {
+                    a.addTarget(b);
+                } else if (b.iCanHasTurret) {
+                    b.addTarget(a);
+                }
+            }
+        },
+        EndContact: function (contact) {
+            var a = contact.GetFixtureA().GetBody().GetUserData();
+            var b = contact.GetFixtureB().GetBody().GetUserData();
+
+            if (a && b) {
+                if (a.iCanHasTurret) {
+                    a.removeTarget(b);
+                } else if (b.iCanHasTurret) {
+                    b.removeTarget(a);
+                }
+            }
+        },
+        PreSolve: function () {},
+        PostSolve: function () {}
+    };
+
+    this.world.SetContactListener(listener);
 
     var walls = [
         [{
@@ -93,6 +126,9 @@ function Stage() {
 
     this.testBody = this.world.CreateBody(bodyDef);
     this.testBody.CreateFixture(fixDef);
+    this.testBody.SetUserData({
+        iCanHasTurret: false
+    });
 
     var anchorDef = new b2BodyDef();
     anchorDef.type = b2Body.b2_staticBody;
@@ -111,6 +147,11 @@ function Stage() {
     jDef.dampingRatio = 0.8;
 
     this.joint = this.world.CreateJoint(jDef);
+
+    this.turrets = [
+        new Turret(this.world, 30, -25),
+        new Turret(this.world, 55, 25)
+    ];
 }
 
 Stage.prototype.setTarget = function (x, y) {
