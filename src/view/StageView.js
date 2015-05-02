@@ -11,7 +11,10 @@ function StageView(stage) {
     var debugDrawCanvas = document.createElement('canvas');
     debugDrawCanvas.width = 640;
     debugDrawCanvas.height = 480;
-    debugDrawCanvas.style.border = "1px solid black";
+    debugDrawCanvas.style.position = 'absolute';
+    debugDrawCanvas.style.left = 0;
+    debugDrawCanvas.style.top = 0;
+    debugDrawCanvas.style.background = '#e0e0e0';
     document.body.appendChild(debugDrawCanvas);
 
     var debugDrawCanvasContext = debugDrawCanvas.getContext("2d");
