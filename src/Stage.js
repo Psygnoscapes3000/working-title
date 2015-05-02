@@ -13,6 +13,7 @@ var b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape;
 
 var STEP_DURATION = 1 / 60.0;
 
+var Critter = require('./Critter.js');
 var Turret = require('./Turret.js');
 
 function Stage() {
@@ -113,23 +114,6 @@ function Stage() {
         wallBody.CreateFixture(wallFixDef);
     }, this);
 
-    var fixDef = new b2FixtureDef();
-    fixDef.density = 1.0;
-    fixDef.friction = 0.2;
-    fixDef.restitution = 0.1;
-    fixDef.shape = new b2CircleShape(1.5);
-
-    var bodyDef = new b2BodyDef();
-    bodyDef.type = b2Body.b2_dynamicBody;
-    bodyDef.position.x = 10;
-    bodyDef.position.y = 0;
-
-    this.testBody = this.world.CreateBody(bodyDef);
-    this.testBody.CreateFixture(fixDef);
-    this.testBody.SetUserData({
-        iCanHasTurret: false
-    });
-
     var anchorDef = new b2BodyDef();
     anchorDef.type = b2Body.b2_staticBody;
     anchorDef.position.x = 0;
@@ -137,30 +121,20 @@ function Stage() {
 
     this.anchor = this.world.CreateBody(anchorDef);
 
-    var jDef = new b2MouseJointDef();
-
-    jDef.bodyA = this.anchor;
-    jDef.bodyB = this.testBody;
-    jDef.target = new b2Vec2(bodyDef.position.x, bodyDef.position.y);
-
-    jDef.maxForce = 0;
-    jDef.dampingRatio = 0.8;
-
-    this.joint = this.world.CreateJoint(jDef);
-
     this.turrets = [
         new Turret(this.world, 30, -25),
         new Turret(this.world, 55, 25)
     ];
+
+    this.critter = new Critter(this.world, this.anchor, 10, 0);
 }
 
 Stage.prototype.setTarget = function (x, y) {
-    this.joint.SetMaxForce(200);
-    this.joint.SetTarget(new b2Vec2(x, y));
+    this.critter.setTarget(x, y);
 };
 
 Stage.prototype.clearTarget = function () {
-    this.joint.SetMaxForce(0);
+    this.critter.clearTarget();
 };
 
 Stage.prototype.advanceTime = function (secondsElapsed) {
