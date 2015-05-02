@@ -109,14 +109,17 @@ function Stage(onEnd) {
     ];
 
     this.critter = new Critter(this.world, this.anchor, 10, 0);
+
+    this.currentTick = 0;
+    this.actionList = [];
+    this.nextActionIndex = 0;
 }
 
 Stage.prototype.setTarget = function (x, y) {
-    this.critter.setTarget(x, y);
+    this.actionList.push({ tick: this.currentTick, x: x, y: y });
 };
 
 Stage.prototype.clearTarget = function () {
-    this.critter.clearTarget();
 };
 
 Stage.prototype.advanceTime = function (secondsElapsed) {
@@ -130,8 +133,20 @@ Stage.prototype.advanceTime = function (secondsElapsed) {
 
     while (this.timeAccumulator > 0) {
         this.timeAccumulator -= STEP_DURATION;
+
+        if (this.nextActionIndex < this.actionList.length) {
+            var action = this.actionList[this.nextActionIndex];
+            if (action.tick >= this.currentTick) {
+                this.critter.setTarget(action.x, action.y);
+                this.nextActionIndex += 1;
+            }
+        }
+
         this.world.Step(STEP_DURATION, 10, 10);
 
+        this.currentTick += 1;
+
+        // check end condition
         var tpos = this.critter.body.GetPosition();
         if (tpos.x > 100) {
             this.onEnd();
