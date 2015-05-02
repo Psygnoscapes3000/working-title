@@ -37,7 +37,7 @@ function StageView(stage) {
         e.preventDefault();
 
         isMouseDown = true;
-        this.stage.setTarget(e.pageX / M_TO_PX, (e.pageY - debugDrawCanvas.height / 2) / M_TO_PX);
+        this.stage.setTarget(e.pageX / M_TO_PX, (debugDrawCanvas.height / 2 - e.pageY) / M_TO_PX);
 
         return false;
     }.bind(this);
@@ -46,7 +46,7 @@ function StageView(stage) {
         e.preventDefault();
 
         if (isMouseDown) {
-            this.stage.setTarget(e.pageX / M_TO_PX, (e.pageY - debugDrawCanvas.height / 2) / M_TO_PX);
+            this.stage.setTarget(e.pageX / M_TO_PX, (debugDrawCanvas.height / 2 - e.pageY) / M_TO_PX);
         }
 
         return false;
