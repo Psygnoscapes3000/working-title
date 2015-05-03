@@ -7,8 +7,6 @@ var b2BodyDef = Box2D.Dynamics.b2BodyDef;
 var b2FixtureDef = Box2D.Dynamics.b2FixtureDef;
 var b2CircleShape = Box2D.Collision.Shapes.b2CircleShape;
 
-var HIT_IMPULSE = 50;
-
 function Turret(world, soundscape, x, y) {
     this.world = world;
     this.soundscape = soundscape;
@@ -54,14 +52,13 @@ Turret.prototype.fireOnTarget = function (target) {
 
     var tpos = target.body.GetPosition();
     var angle = Math.atan2(tpos.y - this.y, tpos.x - this.x);
-    var dx = Math.cos(angle), dy = Math.sin(angle);
 
     // visual indication of hit direction
     this.markerBody.SetAngle(angle);
 
     this.soundscape.play('fire-cannon');
 
-    target.takeDamage(new b2Vec2(dx * HIT_IMPULSE, dy * HIT_IMPULSE));
+    target.takeDamage(angle);
 };
 
 Turret.prototype.advanceTime = function (elapsedSeconds) {

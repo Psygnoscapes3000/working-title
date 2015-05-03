@@ -9,6 +9,7 @@ var b2CircleShape = Box2D.Collision.Shapes.b2CircleShape;
 var b2MouseJointDef = Box2D.Dynamics.Joints.b2MouseJointDef;
 
 var MOVE_FORCE = 1500;
+var HIT_IMPULSE = 50;
 
 function Critter(world, soundscape, anchor, x, y) {
     this.world = world;
@@ -61,8 +62,11 @@ Critter.prototype.setupPhysicsStep = function () {
     }
 };
 
-Critter.prototype.takeDamage = function (impulse) {
-    this.body.ApplyImpulse(impulse, this.body.GetPosition());
+Critter.prototype.takeDamage = function (angle) {
+    var dx = Math.cos(angle), dy = Math.sin(angle);
+
+    this.body.ApplyImpulse(new b2Vec2(dx * HIT_IMPULSE, dy * HIT_IMPULSE), this.body.GetPosition());
+
     this.soundscape.play(Math.random() < 0.5 ? 'impact-metal.1' : 'impact-metal.2');
 };
 
