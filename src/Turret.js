@@ -31,14 +31,10 @@ function Turret(world, soundscape, x, y) {
 }
 
 Turret.prototype.addTarget = function (target) {
-    console.log('yo', target);
-
     this.targetStack.push(target);
 };
 
 Turret.prototype.removeTarget = function (target) {
-    console.log('oops', target);
-
     var i = this.targetStack.indexOf(target);
     if (i !== -1) {
         this.targetStack.splice(i, 1);
@@ -46,8 +42,6 @@ Turret.prototype.removeTarget = function (target) {
 };
 
 Turret.prototype.fireOnTarget = function (target) {
-    console.log('firing on', target);
-
     this.cooldown = 1;
 
     var tpos = target.body.GetPosition();
