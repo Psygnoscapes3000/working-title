@@ -143,11 +143,11 @@ Stage.prototype.advanceTime = function (secondsElapsed) {
             var critterCount = this.critterList.length;
 
             if (critterCount < this.priorActionQueueList.length) {
-                this.critterList.push(new Critter(this.world, this.soundscape, this.anchor, 10 * critterCount, 0));
+                this.critterList.push(new Critter(this.world, this.soundscape, this.anchor, 0, 0));
                 this.actionQueueList.push(this.priorActionQueueList[critterCount]);
                 this.nextActionIndexList.push(0);
             } else {
-                this.activeCritter = new Critter(this.world, this.soundscape, this.anchor, 10 * critterCount, 0);
+                this.activeCritter = new Critter(this.world, this.soundscape, this.anchor, 0, 0);
                 this.activeActionQueue = [];
 
                 this.critterList.push(this.activeCritter);
