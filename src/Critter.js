@@ -23,7 +23,7 @@ function Critter(world, soundscape, anchor, x, y) {
 
     var bodyDef = new b2BodyDef();
     bodyDef.type = b2Body.b2_dynamicBody;
-    bodyDef.linearDamping = 10;
+    bodyDef.linearDamping = 20;
     bodyDef.angularDamping = 1;
     bodyDef.position.x = x;
     bodyDef.position.y = y;
@@ -32,8 +32,8 @@ function Critter(world, soundscape, anchor, x, y) {
     this.body.CreateFixture(fixDef);
     this.body.SetUserData(this);
 
-    this.targetX = x;
-    this.targetY = y;
+    this.targetX = null;
+    this.targetY = null;
 }
 
 Critter.prototype.setTarget = function (x, y) {
@@ -45,6 +45,10 @@ Critter.prototype.clearTarget = function () {
 };
 
 Critter.prototype.setupPhysicsStep = function () {
+    if (this.targetX === null) {
+        return;
+    }
+
     var tpos = this.body.GetPosition();
     var tvel = this.body.GetLinearVelocity();
 
@@ -58,6 +62,8 @@ Critter.prototype.setupPhysicsStep = function () {
         this.body.ApplyForce(new b2Vec2(dx * MOVE_FORCE, dy * MOVE_FORCE), tpos);
         this.body.SetLinearDamping(15);
     } else {
+        this.targetX = null;
+        this.targetY = null;
         this.body.SetLinearDamping(20);
     }
 };
