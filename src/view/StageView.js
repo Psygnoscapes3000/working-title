@@ -87,7 +87,23 @@ StageView.prototype.render = function () {
         }, this);
     }, this);
 
-    this.stage.world.DrawDebugData();
+    this.stage.turrets.forEach(function (turret) {
+        this.ctx.beginPath();
+        this.ctx.arc(turret.x * M_TO_PX, turret.y * M_TO_PX, 10, 0, 2 * Math.PI, false);
+        this.ctx.fillStyle = '#888888';
+        this.ctx.fill();
+    }, this);
+
+    this.stage.critterList.forEach(function (critter) {
+        var pos = critter.body.GetPosition();
+
+        this.ctx.beginPath();
+        this.ctx.arc(pos.x * M_TO_PX, pos.y * M_TO_PX, 10, 0, 2 * Math.PI, false);
+        this.ctx.fillStyle = '#ffffff';
+        this.ctx.fill();
+    }, this);
+
+    //this.stage.world.DrawDebugData();
 };
 
 StageView.prototype.dispose = function () {
