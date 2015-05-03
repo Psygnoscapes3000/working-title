@@ -152,9 +152,12 @@ Stage.prototype.advanceTime = function (secondsElapsed) {
                     this.nextActionIndexList[i] += 1;
                 }
             }
+
+            this.critterList[i].setupPhysicsStep();
         }, this);
 
         this.world.Step(STEP_DURATION, 10, 10);
+        this.world.ClearForces();
 
         this.currentTick += 1;
 

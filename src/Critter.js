@@ -8,6 +8,8 @@ var b2FixtureDef = Box2D.Dynamics.b2FixtureDef;
 var b2CircleShape = Box2D.Collision.Shapes.b2CircleShape;
 var b2MouseJointDef = Box2D.Dynamics.Joints.b2MouseJointDef;
 
+var MOVE_FORCE = 1500;
+
 function Critter(world, anchor, x, y) {
     this.world = world;
 
@@ -19,6 +21,8 @@ function Critter(world, anchor, x, y) {
 
     var bodyDef = new b2BodyDef();
     bodyDef.type = b2Body.b2_dynamicBody;
+    bodyDef.linearDamping = 10;
+    bodyDef.angularDamping = 1;
     bodyDef.position.x = x;
     bodyDef.position.y = y;
 
@@ -26,25 +30,34 @@ function Critter(world, anchor, x, y) {
     this.body.CreateFixture(fixDef);
     this.body.SetUserData(this);
 
-    var jDef = new b2MouseJointDef();
-
-    jDef.bodyA = anchor;
-    jDef.bodyB = this.body;
-    jDef.target = new b2Vec2(bodyDef.position.x, bodyDef.position.y);
-
-    jDef.maxForce = 0;
-    jDef.dampingRatio = 0.8;
-
-    this.joint = this.world.CreateJoint(jDef);
+    this.targetX = x;
+    this.targetY = y;
 }
 
 Critter.prototype.setTarget = function (x, y) {
-    this.joint.SetMaxForce(200);
-    this.joint.SetTarget(new b2Vec2(x, y));
+    this.targetX = x;
+    this.targetY = y;
 };
 
 Critter.prototype.clearTarget = function () {
-    this.joint.SetMaxForce(0);
+};
+
+Critter.prototype.setupPhysicsStep = function () {
+    var tpos = this.body.GetPosition();
+    var tvel = this.body.GetLinearVelocity();
+
+    var distY = this.targetY - tpos.y, distX = this.targetX - tpos.x;
+    var angle = Math.atan2(distY, distX);
+
+    var dx = Math.cos(angle);
+    var dy = Math.sin(angle);
+
+    if (distX * distX + distY * distY > 0.5) {
+        this.body.ApplyForce(new b2Vec2(dx * MOVE_FORCE, dy * MOVE_FORCE), tpos);
+        this.body.SetLinearDamping(15);
+    } else {
+        this.body.SetLinearDamping(20);
+    }
 };
 
 module.exports = Critter;
