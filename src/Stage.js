@@ -199,10 +199,10 @@ Stage.prototype.clearTarget = function () {
 Stage.prototype.advanceTime = function (secondsElapsed) {
     // launch critters
     if (!this.activeCritter) {
-        this.launchTimer += secondsElapsed;
+        this.launchTimer -= secondsElapsed;
 
-        if (this.launchTimer > 0.5) {
-            this.launchTimer -= 0.5;
+        if (this.launchTimer <= 0) {
+            this.launchTimer += 0.5;
 
             var critterCount = this.critterList.length;
 
