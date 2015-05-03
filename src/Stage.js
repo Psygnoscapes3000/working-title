@@ -13,6 +13,7 @@ var b2CircleShape = Box2D.Collision.Shapes.b2CircleShape;
 var b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape;
 
 var STEP_DURATION = 1 / 60.0;
+var THRESHOLD = 19 * (100 / 20) - 1.5;
 
 var Critter = require('./Critter.js');
 var Turret = require('./Turret.js');
@@ -258,7 +259,7 @@ Stage.prototype.advanceTime = function (secondsElapsed) {
         // check end condition
         if (!this.isComplete && this.activeCritter) {
             var tpos = this.activeCritter.body.GetPosition();
-            if (tpos.x > 80 || this.activeCritter.health === 0) {
+            if (tpos.x > THRESHOLD || this.activeCritter.health === 0) {
                 this.isComplete = true;
                 return;
             }
