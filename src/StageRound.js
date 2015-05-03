@@ -1,8 +1,9 @@
 var Stage = require('./Stage.js');
 var StageView = require('./view/StageView.js');
 
-function StageRound(soundscape, recordedActionQueueList) {
-    this.stage = new Stage(soundscape, recordedActionQueueList);
+function StageRound(soundscape, recordedActionQueueList, isFinal) {
+    this.isFinal = isFinal;
+    this.stage = new Stage(soundscape, recordedActionQueueList, isFinal);
     this.view = new StageView(this.stage);
 
     this.preCountdown = 1;

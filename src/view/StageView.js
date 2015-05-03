@@ -204,7 +204,7 @@ StageView.prototype.render = function () {
 
         this.ctx.beginPath();
         this.ctx.arc(critterX, critterY, 10, 0, 2 * Math.PI, false);
-        this.ctx.fillStyle = critter.health > 0 ? '#ffffff' : '#888888';
+        this.ctx.fillStyle = critter.health > 0 ? (critter.isLive ? '#ff80c0' : '#ffffff') : '#888888';
         this.ctx.fill();
 
         if (critter.health > 0) {
