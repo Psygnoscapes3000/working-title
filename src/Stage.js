@@ -16,7 +16,7 @@ var STEP_DURATION = 1 / 60.0;
 var Critter = require('./Critter.js');
 var Turret = require('./Turret.js');
 
-function Stage(soundscape, priorActionQueueList, onEnd, tileRows) {
+function Stage(soundscape, priorActionQueueList, onEnd) {
     this.timeAccumulator = 0;
     this.world = new b2World(new b2Vec2(0, 0), true);
     this.soundscape = soundscape;
@@ -53,10 +53,51 @@ function Stage(soundscape, priorActionQueueList, onEnd, tileRows) {
 
     this.world.SetContactListener(listener);
 
+    var fs = require('fs');
+
+    var canvas = document.createElement('canvas');
+    var img = new Image();
+
+    img.src = 'data:image/png;base64,' + btoa(fs.readFileSync(__dirname + '/assets/stage-1.png', 'binary'));
+
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+
+    var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+    var rows = [],
+        columns = [],
+        rgb = 0;
+
+    var hexToTile = {
+        '000000': 'earth',
+        '882200': 'wall',
+        '00ff00': 'safezone',
+        'ff0000': 'turret'
+    };
+
+    Array.prototype.forEach.call(imgData.data, function (component, idx) {
+        if ((idx & 3) === 3) {
+            var hex = ('00000' + rgb.toString(16)).substr(-6);
+            columns.push(hexToTile[hex]);
+            rgb = 0;
+
+            if (columns.length === canvas.width) {
+                rows.push(columns);
+                columns = [];
+            }
+        } else {
+            rgb = (rgb << 8) | component;
+        }
+    });
+
     var walls = [],
         turrets = [];
 
-    tileRows.forEach(function (columns, rowIdx) {
+    rows.forEach(function (columns, rowIdx) {
         var wallStart,
             wallLen;
 
@@ -70,7 +111,7 @@ function Stage(soundscape, priorActionQueueList, onEnd, tileRows) {
                 ].map(function (vertex) {
                     return {
                         x: vertex.x * 100 / columns.length,
-                        y: (tileRows.length / 2 - vertex.y) * 100 / columns.length
+                        y: (rows.length / 2 - vertex.y) * 100 / columns.length
                     };
                 }));
 
@@ -92,7 +133,7 @@ function Stage(soundscape, priorActionQueueList, onEnd, tileRows) {
                 if (tile === 'turret') {
                     turrets.push({
                         x: (colIdx + 0.5) * 100 / columns.length,
-                        y: (tileRows.length / 2 - (rowIdx + 0.5)) * 100 / columns.length
+                        y: (rows.length / 2 - (rowIdx + 0.5)) * 100 / columns.length
                     });
                 }
             }
