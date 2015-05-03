@@ -94,13 +94,6 @@ function StageView(stage) {
 StageView.prototype.render = function () {
     //this.ctx.clearRect(0, -CANVAS_HEIGHT / 2, CANVAS_WIDTH, CANVAS_HEIGHT / 2);
 
-    var tileToHex = {
-        'earth': '#000000',
-        'wall': '#882200',
-        'safezone': '#00ff00',
-        'turret': '#ff0000'
-    };
-
     var neighbors = [
         { x: 0, y: -1 },
         { x: 1, y: 0 },
@@ -142,24 +135,22 @@ StageView.prototype.render = function () {
             case 'turret':
                 tileIdx = 84;
                 break;
+            case 'safezone':
+                tileIdx = 105 + ((rowIdx ^ colIdx) % 3);
+                break;
             }
 
-            if (tileIdx >= 0) {
-                this.ctx.drawImage(
-                    tilesCanvas,
-                    (tileIdx % SRC_TILE_COLUMNS) * SRC_TILE_WIDTH,
-                    (SRC_TILE_ROWS - 1 - Math.floor(tileIdx / SRC_TILE_COLUMNS)) * SRC_TILE_HEIGHT,
-                    SRC_TILE_WIDTH,
-                    SRC_TILE_HEIGHT,
-                    colIdx * TILE_WIDTH,
-                    (this.stage.rows.length / 2 - rowIdx - 1) * TILE_HEIGHT,
-                    TILE_WIDTH,
-                    TILE_HEIGHT
-                );
-            } else {
-                this.ctx.fillStyle = tileToHex[tile];
-                this.ctx.fillRect(colIdx * TILE_WIDTH, (this.stage.rows.length / 2 - rowIdx - 1) * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
-            }
+            this.ctx.drawImage(
+                tilesCanvas,
+                (tileIdx % SRC_TILE_COLUMNS) * SRC_TILE_WIDTH,
+                (SRC_TILE_ROWS - 1 - Math.floor(tileIdx / SRC_TILE_COLUMNS)) * SRC_TILE_HEIGHT,
+                SRC_TILE_WIDTH,
+                SRC_TILE_HEIGHT,
+                colIdx * TILE_WIDTH,
+                (this.stage.rows.length / 2 - rowIdx - 1) * TILE_HEIGHT,
+                TILE_WIDTH,
+                TILE_HEIGHT
+            );
         }, this);
     }, this);
 
