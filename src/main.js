@@ -4,6 +4,8 @@ var requestAnimationFrame = require('raf');
 var Stage = require('./Stage.js');
 var StageView = require('./view/StageView.js');
 
+var Soundscape = require('./Soundscape.js');
+
 var stats = new Stats();
 stats.domElement.style.position = 'absolute';
 stats.domElement.style.zIndex = 2;
@@ -12,12 +14,14 @@ document.body.appendChild(stats.domElement);
 var stage, view;
 var recordedActionQueueList = [];
 
+var soundscape = new Soundscape();
+
 function restartStage() {
     if (view) {
         view.dispose();
     }
 
-    stage = new Stage(recordedActionQueueList, function (recordedActionList) {
+    stage = new Stage(soundscape, recordedActionQueueList, function (recordedActionList) {
         recordedActionQueueList.push(recordedActionList);
         restartStage();
     });
