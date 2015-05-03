@@ -7,12 +7,14 @@ var b2BodyDef = Box2D.Dynamics.b2BodyDef;
 var b2FixtureDef = Box2D.Dynamics.b2FixtureDef;
 var b2CircleShape = Box2D.Collision.Shapes.b2CircleShape;
 
-function Turret(world, soundscape, x, y) {
+function Turret(world, soundscape, x, y, range) {
     this.world = world;
     this.soundscape = soundscape;
     this.x = x;
     this.y = y;
+    this.range = range;
     this.iCanHasTurret = true;
+    this.angle = 0;
 
     this.cooldown = 0;
     this.targetStack = [];
@@ -23,7 +25,7 @@ function Turret(world, soundscape, x, y) {
     bodyDef.position.y = y;
 
     var fixDef = new b2FixtureDef();
-    fixDef.shape = new b2CircleShape(20);
+    fixDef.shape = new b2CircleShape(this.range);
 
     this.markerBody = this.world.CreateBody(bodyDef);
     this.markerBody.CreateFixture(fixDef).SetSensor(true);
@@ -47,8 +49,7 @@ Turret.prototype.fireOnTarget = function (target) {
     var tpos = target.body.GetPosition();
     var angle = Math.atan2(tpos.y - this.y, tpos.x - this.x);
 
-    // visual indication of hit direction
-    this.markerBody.SetAngle(angle);
+    this.angle = angle;
 
     this.soundscape.play('fire-cannon');
 

@@ -66,6 +66,7 @@ function Stage(soundscape, priorActionQueueList) {
     this.world = new b2World(new b2Vec2(0, 0), true);
     this.soundscape = soundscape;
     this.isComplete = false;
+    this.rows = rows;
 
     var listener = {
         BeginContact: function (contact) {
@@ -170,7 +171,7 @@ function Stage(soundscape, priorActionQueueList) {
     this.anchor = this.world.CreateBody(anchorDef);
 
     this.turrets = turrets.map(function (turret) {
-        return new Turret(this.world, this.soundscape, turret.x, turret.y);
+        return new Turret(this.world, this.soundscape, turret.x, turret.y, 20);
     }, this);
 
     this.currentTick = 0;
