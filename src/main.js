@@ -11,25 +11,53 @@ stats.domElement.style.position = 'absolute';
 stats.domElement.style.zIndex = 2;
 document.body.appendChild(stats.domElement);
 
-var stage, view;
-var recordedActionQueueList = [];
-
 var soundscape = new Soundscape();
 
-function restartStage() {
-    if (view) {
-        view.dispose();
-    }
+function PreMode(recordedActionQueueList) {
+    var stageCountdown = 1;
 
-    stage = new Stage(soundscape, recordedActionQueueList, function (recordedActionList) {
-        recordedActionQueueList.push(recordedActionList);
-        restartStage();
-    });
+    var stage = new Stage(soundscape, recordedActionQueueList);
+    var view = new StageView(stage);
 
-    view = new StageView(stage);
+    this.advanceTime = function (elapsedSeconds) {
+        stageCountdown -= elapsedSeconds;
+
+        if (stageCountdown <= 0) {
+            mode = new RunningMode(stage, view);
+        }
+    };
+
+    this.view = view;
 }
 
-restartStage();
+function RunningMode(stage, view) {
+    this.advanceTime = function (elapsedSeconds) {
+        stage.advanceTime(elapsedSeconds);
+
+        if (stage.isComplete) {
+            mode = new PostMode(stage, view);
+        }
+    };
+
+    this.view = view;
+}
+
+function PostMode(stage, view, recordedActionQueueList) {
+    var stageCountdown = 1;
+
+    this.advanceTime = function (elapsedSeconds) {
+        stageCountdown -= elapsedSeconds;
+
+        if (stageCountdown <= 0) {
+            view.dispose();
+            mode = new PreMode(stage.actionQueueList);
+        }
+    };
+
+    this.view = view;
+}
+
+var mode = new PreMode([]);
 
 var lastTime = performance.now();
 
@@ -43,8 +71,8 @@ requestAnimationFrame(function () {
 
     lastTime = time;
 
-    stage.advanceTime(elapsedSeconds);
-    view.render();
+    mode.advanceTime(elapsedSeconds);
+    mode.view.render();
 
     stats.end();
 

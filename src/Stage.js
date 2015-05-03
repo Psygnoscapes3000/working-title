@@ -61,11 +61,11 @@ var rows = (function () {
     return rows;
 })();
 
-function Stage(soundscape, priorActionQueueList, onEnd) {
+function Stage(soundscape, priorActionQueueList) {
     this.timeAccumulator = 0;
     this.world = new b2World(new b2Vec2(0, 0), true);
     this.soundscape = soundscape;
-    this.onEnd = onEnd;
+    this.isComplete = false;
 
     var listener = {
         BeginContact: function (contact) {
@@ -188,6 +188,10 @@ function Stage(soundscape, priorActionQueueList, onEnd) {
 }
 
 Stage.prototype.setTarget = function (x, y) {
+    if (this.isComplete) {
+        return;
+    }
+
     if (this.activeActionQueue) {
         this.activeActionQueue.push({ tick: this.currentTick, x: x, y: y });
     }
@@ -199,10 +203,10 @@ Stage.prototype.clearTarget = function () {
 Stage.prototype.advanceTime = function (secondsElapsed) {
     // launch critters
     if (!this.activeCritter) {
-        this.launchTimer += secondsElapsed;
+        this.launchTimer -= secondsElapsed;
 
-        if (this.launchTimer > 0.5) {
-            this.launchTimer -= 0.5;
+        if (this.launchTimer <= 0) {
+            this.launchTimer += 0.5;
 
             var critterCount = this.critterList.length;
 
@@ -250,10 +254,10 @@ Stage.prototype.advanceTime = function (secondsElapsed) {
         this.currentTick += 1;
 
         // check end condition
-        if (this.activeCritter) {
+        if (!this.isComplete && this.activeCritter) {
             var tpos = this.activeCritter.body.GetPosition();
             if (tpos.x > 80 || this.activeCritter.health === 0) {
-                this.onEnd(this.activeActionQueue);
+                this.isComplete = true;
                 return;
             }
         }
