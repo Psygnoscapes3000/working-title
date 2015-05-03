@@ -115,19 +115,22 @@ function Stage(soundscape, priorActionQueueList, onEnd) {
     this.actionQueueList = [];
     this.nextActionIndexList = [];
 
-    this.critterList.push(new Critter(this.world, this.soundscape, this.anchor, 10 * priorActionQueueList.length, 0));
-    this.actionQueueList.push([]);
-    this.nextActionIndexList.push(0);
-
     priorActionQueueList.forEach(function (list, i) {
         this.critterList.push(new Critter(this.world, this.soundscape, this.anchor, 10 * i, 0));
         this.actionQueueList.push(list);
         this.nextActionIndexList.push(0);
     }, this);
+
+    this.activeCritter = new Critter(this.world, this.soundscape, this.anchor, 10 * priorActionQueueList.length, 0);
+    this.activeActionQueue = [];
+
+    this.critterList.push(this.activeCritter);
+    this.actionQueueList.push(this.activeActionQueue);
+    this.nextActionIndexList.push(0);
 }
 
 Stage.prototype.setTarget = function (x, y) {
-    this.actionQueueList[0].push({ tick: this.currentTick, x: x, y: y });
+    this.activeActionQueue.push({ tick: this.currentTick, x: x, y: y });
 };
 
 Stage.prototype.clearTarget = function () {
@@ -163,9 +166,9 @@ Stage.prototype.advanceTime = function (secondsElapsed) {
         this.currentTick += 1;
 
         // check end condition
-        var tpos = this.critterList[0].body.GetPosition();
-        if (tpos.x > 80 || this.critterList[0].health === 0) {
-            this.onEnd(this.actionQueueList[0]);
+        var tpos = this.activeCritter.body.GetPosition();
+        if (tpos.x > 80 || this.activeCritter.health === 0) {
+            this.onEnd(this.activeActionQueue);
             return;
         }
     }
