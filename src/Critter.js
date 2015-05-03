@@ -39,7 +39,7 @@ function Critter(world, soundscape, anchor, x, y) {
 
 Critter.prototype.setTarget = function (x, y) {
     if (this.health === 0) {
-        throw new Error('not alive');
+        return; // this may happen when recorded instructions are longer
     }
 
     this.targetX = x;
