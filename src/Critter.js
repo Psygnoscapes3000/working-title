@@ -11,10 +11,11 @@ var b2MouseJointDef = Box2D.Dynamics.Joints.b2MouseJointDef;
 var MOVE_FORCE = 1500;
 var HIT_IMPULSE = 50;
 
-function Critter(world, soundscape, anchor, x, y) {
+function Critter(world, soundscape, anchor, x, y, isLive) {
     this.world = world;
     this.soundscape = soundscape;
     this.health = 1;
+    this.isLive = isLive;
 
     var fixDef = new b2FixtureDef();
     fixDef.density = 1.0;
@@ -81,13 +82,14 @@ Critter.prototype.setupPhysicsStep = function () {
 
 Critter.prototype.takeDamage = function (angle) {
     var dx = Math.cos(angle), dy = Math.sin(angle);
+    var impulse = this.isLive ? HIT_IMPULSE * 4 : HIT_IMPULSE;
 
-    this.body.ApplyImpulse(new b2Vec2(dx * HIT_IMPULSE, dy * HIT_IMPULSE), this.body.GetPosition());
+    this.body.ApplyImpulse(new b2Vec2(dx * impulse, dy * impulse), this.body.GetPosition());
 
     this.soundscape.play(Math.random() < 0.5 ? 'impact-metal.1' : 'impact-metal.2');
 
     if (this.health > 0) {
-        this.health = Math.max(0, this.health - 0.3);
+        this.health = Math.max(0, this.health - (this.isLive ? 0.6 : 0.3));
 
         if (this.health === 0) {
             this.targetX = null;

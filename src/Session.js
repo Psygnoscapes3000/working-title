@@ -2,7 +2,7 @@ var StageRound = require('./StageRound.js');
 
 function Session(soundscape) {
     this.soundscape = soundscape;
-    this.currentRound = new StageRound(this.soundscape, []);
+    this.currentRound = new StageRound(this.soundscape, [], false);
 }
 
 Session.prototype.advanceTime = function (elapsedSeconds) {
@@ -10,7 +10,13 @@ Session.prototype.advanceTime = function (elapsedSeconds) {
     this.currentRound.advanceTime(elapsedSeconds);
 
     if (this.currentRound.isComplete) {
-        this.currentRound = new StageRound(this.soundscape, this.currentRound.actionQueueList);
+        if (this.currentRound.isFinal) {
+            // console.log('final round!');
+        } else {
+            var recordedList = this.currentRound.actionQueueList;
+
+            this.currentRound = new StageRound(this.soundscape, recordedList, recordedList.length > 2);
+        }
     }
 };
 

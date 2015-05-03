@@ -13,6 +13,7 @@ var b2CircleShape = Box2D.Collision.Shapes.b2CircleShape;
 var b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape;
 
 var STEP_DURATION = 1 / 60.0;
+var THRESHOLD = 19 * (100 / 20) - 1.5;
 
 var Critter = require('./Critter.js');
 var Turret = require('./Turret.js');
@@ -61,11 +62,12 @@ var rows = (function () {
     return rows;
 })();
 
-function Stage(soundscape, priorActionQueueList) {
+function Stage(soundscape, priorActionQueueList, isFinal) {
     this.timeAccumulator = 0;
     this.world = new b2World(new b2Vec2(0, 0), true);
     this.soundscape = soundscape;
     this.isComplete = false;
+    this.isFinal = isFinal;
     this.rows = rows;
 
     var listener = {
@@ -216,7 +218,7 @@ Stage.prototype.advanceTime = function (secondsElapsed) {
                 this.actionQueueList.push(this.priorActionQueueList[critterCount]);
                 this.nextActionIndexList.push(0);
             } else {
-                this.activeCritter = new Critter(this.world, this.soundscape, this.anchor, 0, 0);
+                this.activeCritter = new Critter(this.world, this.soundscape, this.anchor, 0, 0, this.isFinal);
                 this.activeActionQueue = [];
 
                 this.critterList.push(this.activeCritter);
@@ -257,7 +259,7 @@ Stage.prototype.advanceTime = function (secondsElapsed) {
         // check end condition
         if (!this.isComplete && this.activeCritter) {
             var tpos = this.activeCritter.body.GetPosition();
-            if (tpos.x > 80 || this.activeCritter.health === 0) {
+            if (tpos.x > THRESHOLD || this.activeCritter.health === 0) {
                 this.isComplete = true;
                 return;
             }
