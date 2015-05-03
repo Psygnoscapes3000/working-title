@@ -191,12 +191,28 @@ StageView.prototype.render = function () {
     }, this);
 
     this.stage.critterList.forEach(function (critter) {
-        var pos = critter.body.GetPosition();
+        var critterPos = critter.body.GetPosition(),
+            critterX = critterPos.x * M_TO_PX,
+            critterY = critterPos.y * M_TO_PX;
+
+        var HEALTH_BAR_WIDTH = 30,
+            HEALTH_BAR_HEIGHT = 5,
+            HEALTH_BAR_DISTANCE = 15;
 
         this.ctx.beginPath();
-        this.ctx.arc(pos.x * M_TO_PX, pos.y * M_TO_PX, 10, 0, 2 * Math.PI, false);
-        this.ctx.fillStyle = critter.health ? '#ffffff' : '#666';
+        this.ctx.arc(critterX, critterY, 10, 0, 2 * Math.PI, false);
+        this.ctx.fillStyle = critter.health > 0 ? '#ffffff' : '#888888';
         this.ctx.fill();
+
+        if (critter.health > 0) {
+            var healthBarX = critterX - HEALTH_BAR_WIDTH / 2,
+                healthBarY = critterY + HEALTH_BAR_DISTANCE;
+
+            this.ctx.fillStyle = 'red';
+            this.ctx.fillRect(healthBarX, healthBarY, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT);
+            this.ctx.fillStyle = 'lime';
+            this.ctx.fillRect(healthBarX, healthBarY, HEALTH_BAR_WIDTH * critter.health, HEALTH_BAR_HEIGHT);
+        }
     }, this);
 
     // this.stage.world.DrawDebugData();
