@@ -1,5 +1,6 @@
 
 var Box2D = require('box2dweb');
+var fs = require('fs');
 
 var b2World = Box2D.Dynamics.b2World;
 var b2Vec2 = Box2D.Common.Math.b2Vec2;
@@ -15,6 +16,50 @@ var STEP_DURATION = 1 / 60.0;
 
 var Critter = require('./Critter.js');
 var Turret = require('./Turret.js');
+
+var rows = (function () {
+    var img = new Image();
+
+    img.src = 'data:image/png;base64,' + btoa(fs.readFileSync(__dirname + '/assets/stage-1.png', 'binary'));
+
+    var canvas = document.createElement('canvas');
+
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+
+    var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+    var rows = [],
+        columns = [],
+        rgb = 0;
+
+    var hexToTile = {
+        '000000': 'earth',
+        '882200': 'wall',
+        '00ff00': 'safezone',
+        'ff0000': 'turret'
+    };
+
+    Array.prototype.forEach.call(imgData.data, function (component, idx) {
+        if ((idx & 3) === 3) {
+            var hex = ('00000' + rgb.toString(16)).substr(-6);
+            columns.push(hexToTile[hex]);
+            rgb = 0;
+
+            if (columns.length === canvas.width) {
+                rows.push(columns);
+                columns = [];
+            }
+        } else {
+            rgb = (rgb << 8) | component;
+        }
+    });
+
+    return rows;
+})();
 
 function Stage(soundscape, priorActionQueueList, onEnd) {
     this.timeAccumulator = 0;
@@ -52,47 +97,6 @@ function Stage(soundscape, priorActionQueueList, onEnd) {
     };
 
     this.world.SetContactListener(listener);
-
-    var fs = require('fs');
-
-    var canvas = document.createElement('canvas');
-    var img = new Image();
-
-    img.src = 'data:image/png;base64,' + btoa(fs.readFileSync(__dirname + '/assets/stage-1.png', 'binary'));
-
-    canvas.width = img.width;
-    canvas.height = img.height;
-
-    var ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0);
-
-    var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-    var rows = [],
-        columns = [],
-        rgb = 0;
-
-    var hexToTile = {
-        '000000': 'earth',
-        '882200': 'wall',
-        '00ff00': 'safezone',
-        'ff0000': 'turret'
-    };
-
-    Array.prototype.forEach.call(imgData.data, function (component, idx) {
-        if ((idx & 3) === 3) {
-            var hex = ('00000' + rgb.toString(16)).substr(-6);
-            columns.push(hexToTile[hex]);
-            rgb = 0;
-
-            if (columns.length === canvas.width) {
-                rows.push(columns);
-                columns = [];
-            }
-        } else {
-            rgb = (rgb << 8) | component;
-        }
-    });
 
     var walls = [],
         turrets = [];
