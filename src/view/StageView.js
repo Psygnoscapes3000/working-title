@@ -1,5 +1,6 @@
 
 var Box2D = require('box2dweb');
+var fs = require('fs');
 
 var b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
 
@@ -14,6 +15,17 @@ var CANVAS_HEIGHT = TILE_ROWS * TILE_HEIGHT;
 
 var M_TO_PX = CANVAS_WIDTH / 100;
 
+var tilesImg = new Image();
+
+tilesImg.src = 'data:image/png;base64,' + btoa(fs.readFileSync(__dirname + '/../assets/tiles.png', 'binary'));
+
+var tilesCanvas = document.createElement('canvas');
+tilesCanvas.width = tilesImg.width;
+tilesCanvas.height = tilesImg.height;
+var tilesCtx = tilesCanvas.getContext('2d');
+tilesCtx.scale(1, -1);
+tilesCtx.drawImage(tilesImg, 0, 0, tilesImg.width, tilesImg.height, 0, -tilesImg.height, tilesImg.width, tilesImg.height);
+
 function StageView(stage) {
     this.stage = stage;
 
@@ -27,9 +39,13 @@ function StageView(stage) {
 
     this.canvas = canvas;
 
-    var ctx = canvas.getContext("2d");
+    var ctx = canvas.getContext('2d');
     ctx.translate(0, canvas.height / 2);
     ctx.scale(1, -1);
+
+    ctx.imageSmoothingEnabled = false;
+    ctx.mozImageSmoothingEnabled = false;
+    ctx.webkitImageSmoothingEnabled = false;
 
     var debugDraw = new b2DebugDraw();
     debugDraw.SetSprite(ctx);
@@ -83,7 +99,12 @@ StageView.prototype.render = function () {
     this.stage.rows.forEach(function (columns, rowIdx) {
         columns.forEach(function (tile, colIdx) {
             this.ctx.fillStyle = tileToHex[tile];
-            this.ctx.fillRect(colIdx * TILE_WIDTH, (this.stage.rows.length / 2 - rowIdx - 1) * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+
+            if (tile === 'earth') {
+                this.ctx.drawImage(tilesCanvas, (5 + ((rowIdx ^ colIdx) % 12)) * 16, (12 - 1 - 7) * 16, 16, 16, colIdx * TILE_WIDTH, (this.stage.rows.length / 2 - rowIdx - 1) * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+            } else {
+                this.ctx.fillRect(colIdx * TILE_WIDTH, (this.stage.rows.length / 2 - rowIdx - 1) * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+            }
         }, this);
     }, this);
 
