@@ -139,6 +139,9 @@ StageView.prototype.render = function () {
                 tileIdx = 0 + neighSum * 3 + ((rowIdx ^ colIdx) % 3);
 
                 break;
+            case 'turret':
+                tileIdx = 84;
+                break;
             }
 
             if (tileIdx >= 0) {
