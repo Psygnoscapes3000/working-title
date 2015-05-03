@@ -1,10 +1,8 @@
 var Stats = require('stats.js');
 var requestAnimationFrame = require('raf');
 
-var Stage = require('./Stage.js');
-var StageView = require('./view/StageView.js');
-
 var Soundscape = require('./Soundscape.js');
+var Session = require('./Session.js');
 
 var stats = new Stats();
 stats.domElement.style.position = 'absolute';
@@ -13,51 +11,7 @@ document.body.appendChild(stats.domElement);
 
 var soundscape = new Soundscape();
 
-function PreMode(recordedActionQueueList) {
-    var stageCountdown = 1;
-
-    var stage = new Stage(soundscape, recordedActionQueueList);
-    var view = new StageView(stage);
-
-    this.advanceTime = function (elapsedSeconds) {
-        stageCountdown -= elapsedSeconds;
-
-        if (stageCountdown <= 0) {
-            mode = new RunningMode(stage, view);
-        }
-    };
-
-    this.view = view;
-}
-
-function RunningMode(stage, view) {
-    this.advanceTime = function (elapsedSeconds) {
-        stage.advanceTime(elapsedSeconds);
-
-        if (stage.isComplete) {
-            mode = new PostMode(stage, view);
-        }
-    };
-
-    this.view = view;
-}
-
-function PostMode(stage, view, recordedActionQueueList) {
-    var stageCountdown = 1;
-
-    this.advanceTime = function (elapsedSeconds) {
-        stageCountdown -= elapsedSeconds;
-
-        if (stageCountdown <= 0) {
-            view.dispose();
-            mode = new PreMode(stage.actionQueueList);
-        }
-    };
-
-    this.view = view;
-}
-
-var mode = new PreMode([]);
+var session = new Session(soundscape);
 
 var lastTime = performance.now();
 
@@ -71,8 +25,8 @@ requestAnimationFrame(function () {
 
     lastTime = time;
 
-    mode.advanceTime(elapsedSeconds);
-    mode.view.render();
+    session.advanceTime(elapsedSeconds);
+    session.currentRound.view.render();
 
     stats.end();
 
