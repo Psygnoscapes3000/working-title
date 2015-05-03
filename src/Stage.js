@@ -66,6 +66,7 @@ function Stage(soundscape, priorActionQueueList) {
     this.world = new b2World(new b2Vec2(0, 0), true);
     this.soundscape = soundscape;
     this.isComplete = false;
+    this.rows = rows;
 
     var listener = {
         BeginContact: function (contact) {

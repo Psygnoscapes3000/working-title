@@ -72,6 +72,21 @@ function StageView(stage) {
 
 StageView.prototype.render = function () {
     this.ctx.clearRect(0, -CANVAS_HEIGHT / 2, CANVAS_WIDTH, CANVAS_HEIGHT / 2);
+
+    var tileToHex = {
+        'earth': '#000000',
+        'wall': '#882200',
+        'safezone': '#00ff00',
+        'turret': '#ff0000'
+    };
+
+    this.stage.rows.forEach(function (columns, rowIdx) {
+        columns.forEach(function (tile, colIdx) {
+            this.ctx.fillStyle = tileToHex[tile];
+            this.ctx.fillRect(colIdx * TILE_WIDTH, (this.stage.rows.length / 2 - rowIdx - 1) * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+        }, this);
+    }, this);
+
     this.stage.world.DrawDebugData();
 };
 
