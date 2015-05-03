@@ -179,25 +179,48 @@ function Stage(soundscape, priorActionQueueList, onEnd) {
     this.actionQueueList = [];
     this.nextActionIndexList = [];
 
-    this.critterList.push(new Critter(this.world, this.soundscape, this.anchor, 10 * priorActionQueueList.length, 0));
-    this.actionQueueList.push([]);
-    this.nextActionIndexList.push(0);
+    this.priorActionQueueList = priorActionQueueList;
 
-    priorActionQueueList.forEach(function (list, i) {
-        this.critterList.push(new Critter(this.world, this.soundscape, this.anchor, 10 * i, 0));
-        this.actionQueueList.push(list);
-        this.nextActionIndexList.push(0);
-    }, this);
+    this.activeCritter = null;
+    this.activeActionQueue = null;
+
+    this.launchTimer = 0;
 }
 
 Stage.prototype.setTarget = function (x, y) {
-    this.actionQueueList[0].push({ tick: this.currentTick, x: x, y: y });
+    if (this.activeActionQueue) {
+        this.activeActionQueue.push({ tick: this.currentTick, x: x, y: y });
+    }
 };
 
 Stage.prototype.clearTarget = function () {
 };
 
 Stage.prototype.advanceTime = function (secondsElapsed) {
+    // launch critters
+    if (!this.activeCritter) {
+        this.launchTimer += secondsElapsed;
+
+        if (this.launchTimer > 0.5) {
+            this.launchTimer -= 0.5;
+
+            var critterCount = this.critterList.length;
+
+            if (critterCount < this.priorActionQueueList.length) {
+                this.critterList.push(new Critter(this.world, this.soundscape, this.anchor, 0, 0));
+                this.actionQueueList.push(this.priorActionQueueList[critterCount]);
+                this.nextActionIndexList.push(0);
+            } else {
+                this.activeCritter = new Critter(this.world, this.soundscape, this.anchor, 0, 0);
+                this.activeActionQueue = [];
+
+                this.critterList.push(this.activeCritter);
+                this.actionQueueList.push(this.activeActionQueue);
+                this.nextActionIndexList.push(0);
+            }
+        }
+    }
+
     // turret AI
     this.turrets.forEach(function (turret) {
         turret.advanceTime(secondsElapsed);
@@ -227,10 +250,12 @@ Stage.prototype.advanceTime = function (secondsElapsed) {
         this.currentTick += 1;
 
         // check end condition
-        var tpos = this.critterList[0].body.GetPosition();
-        if (tpos.x > 80 || this.critterList[0].health === 0) {
-            this.onEnd(this.actionQueueList[0]);
-            return;
+        if (this.activeCritter) {
+            var tpos = this.activeCritter.body.GetPosition();
+            if (tpos.x > 80 || this.activeCritter.health === 0) {
+                this.onEnd(this.activeActionQueue);
+                return;
+            }
         }
     }
 };

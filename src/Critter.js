@@ -33,6 +33,8 @@ function Critter(world, soundscape, anchor, x, y) {
     this.body.CreateFixture(fixDef);
     this.body.SetUserData(this);
 
+    this.body.ApplyImpulse(new b2Vec2(MOVE_FORCE, 0), new b2Vec2(x, y));
+
     this.targetX = null;
     this.targetY = null;
 }
