@@ -1,5 +1,6 @@
 
 var Box2D = require('box2dweb');
+var fs = require('fs');
 
 var b2World = Box2D.Dynamics.b2World;
 var b2Vec2 = Box2D.Common.Math.b2Vec2;
@@ -15,6 +16,50 @@ var STEP_DURATION = 1 / 60.0;
 
 var Critter = require('./Critter.js');
 var Turret = require('./Turret.js');
+
+var rows = (function () {
+    var img = new Image();
+
+    img.src = 'data:image/png;base64,' + btoa(fs.readFileSync(__dirname + '/assets/stage-1.png', 'binary'));
+
+    var canvas = document.createElement('canvas');
+
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+
+    var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+    var rows = [],
+        columns = [],
+        rgb = 0;
+
+    var hexToTile = {
+        '000000': 'earth',
+        '882200': 'wall',
+        '00ff00': 'safezone',
+        'ff0000': 'turret'
+    };
+
+    Array.prototype.forEach.call(imgData.data, function (component, idx) {
+        if ((idx & 3) === 3) {
+            var hex = ('00000' + rgb.toString(16)).substr(-6);
+            columns.push(hexToTile[hex]);
+            rgb = 0;
+
+            if (columns.length === canvas.width) {
+                rows.push(columns);
+                columns = [];
+            }
+        } else {
+            rgb = (rgb << 8) | component;
+        }
+    });
+
+    return rows;
+})();
 
 function Stage(soundscape, priorActionQueueList, onEnd) {
     this.timeAccumulator = 0;
@@ -53,33 +98,53 @@ function Stage(soundscape, priorActionQueueList, onEnd) {
 
     this.world.SetContactListener(listener);
 
-    var walls = [
-        [
-            { x: -1, y: 20 },
-            { x: 25, y: 18 },
-            { x: 50, y: 17 },
-            { x: 75, y: 18 },
-            { x: 101, y: 20 },
-            { x: 101, y: 101 },
-            { x: -1, y: 101 }
-        ], [
-            { x: -1, y: -20 },
-            { x: -1, y: -101 },
-            { x: 101, y: -101 },
-            { x: 101, y: -20 },
-            { x: 75, y: -18 },
-            { x: 50, y: -17 },
-            { x: 25, y: -18 }
-        ], [
-            { x: 25, y: 10 },
-            { x: 25, y: -10 },
-            { x: 60, y: 10 }
-        ], [
-            { x: 75, y: 10 },
-            { x: 40, y: -10 },
-            { x: 75, y: -10 }
-        ]
-    ];
+    var walls = [],
+        turrets = [];
+
+    rows.forEach(function (columns, rowIdx) {
+        var wallStart,
+            wallLen;
+
+        function purgeWall() {
+            if (wallLen) {
+                walls.push([
+                    { x: wallStart, y: rowIdx },
+                    { x: wallStart, y: rowIdx + 1 },
+                    { x: wallStart + wallLen, y: rowIdx + 1 },
+                    { x: wallStart + wallLen, y: rowIdx }
+                ].map(function (vertex) {
+                    return {
+                        x: vertex.x * 100 / columns.length,
+                        y: (rows.length / 2 - vertex.y) * 100 / columns.length
+                    };
+                }));
+
+                wallLen = 0;
+            }
+        }
+
+        columns.forEach(function (tile, colIdx) {
+            if (tile === 'wall') {
+                if (wallLen) {
+                    wallLen++;
+                } else {
+                    wallStart = colIdx;
+                    wallLen = 1;
+                }
+            } else {
+                purgeWall();
+
+                if (tile === 'turret') {
+                    turrets.push({
+                        x: (colIdx + 0.5) * 100 / columns.length,
+                        y: (rows.length / 2 - (rowIdx + 0.5)) * 100 / columns.length
+                    });
+                }
+            }
+        });
+
+        purgeWall();
+    });
 
     walls.forEach(function (vertices) {
         var wallFixDef = new b2FixtureDef();
@@ -104,10 +169,9 @@ function Stage(soundscape, priorActionQueueList, onEnd) {
 
     this.anchor = this.world.CreateBody(anchorDef);
 
-    this.turrets = [
-        new Turret(this.world, this.soundscape, 30, -25),
-        new Turret(this.world, this.soundscape, 55, 25)
-    ];
+    this.turrets = turrets.map(function (turret) {
+        return new Turret(this.world, this.soundscape, turret.x, turret.y);
+    }, this);
 
     this.currentTick = 0;
 
