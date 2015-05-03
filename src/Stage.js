@@ -16,7 +16,7 @@ var STEP_DURATION = 1 / 60.0;
 var Critter = require('./Critter.js');
 var Turret = require('./Turret.js');
 
-function Stage(soundscape, priorActionQueueList, onEnd) {
+function Stage(soundscape, priorActionQueueList, onEnd, tileRows) {
     this.timeAccumulator = 0;
     this.world = new b2World(new b2Vec2(0, 0), true);
     this.soundscape = soundscape;
@@ -53,33 +53,53 @@ function Stage(soundscape, priorActionQueueList, onEnd) {
 
     this.world.SetContactListener(listener);
 
-    var walls = [
-        [
-            { x: -1, y: 20 },
-            { x: 25, y: 18 },
-            { x: 50, y: 17 },
-            { x: 75, y: 18 },
-            { x: 101, y: 20 },
-            { x: 101, y: 101 },
-            { x: -1, y: 101 }
-        ], [
-            { x: -1, y: -20 },
-            { x: -1, y: -101 },
-            { x: 101, y: -101 },
-            { x: 101, y: -20 },
-            { x: 75, y: -18 },
-            { x: 50, y: -17 },
-            { x: 25, y: -18 }
-        ], [
-            { x: 25, y: 10 },
-            { x: 25, y: -10 },
-            { x: 60, y: 10 }
-        ], [
-            { x: 75, y: 10 },
-            { x: 40, y: -10 },
-            { x: 75, y: -10 }
-        ]
-    ];
+    var walls = [],
+        turrets = [];
+
+    tileRows.forEach(function (columns, rowIdx) {
+        var wallStart,
+            wallLen;
+
+        function purgeWall() {
+            if (wallLen) {
+                walls.push([
+                    { x: wallStart, y: rowIdx },
+                    { x: wallStart, y: rowIdx + 1 },
+                    { x: wallStart + wallLen, y: rowIdx + 1 },
+                    { x: wallStart + wallLen, y: rowIdx }
+                ].map(function (vertex) {
+                    return {
+                        x: vertex.x * 100 / columns.length,
+                        y: (tileRows.length / 2 - vertex.y) * 100 / columns.length
+                    };
+                }));
+
+                wallLen = 0;
+            }
+        }
+
+        columns.forEach(function (tile, colIdx) {
+            if (tile === 'wall') {
+                if (wallLen) {
+                    wallLen++;
+                } else {
+                    wallStart = colIdx;
+                    wallLen = 1;
+                }
+            } else {
+                purgeWall();
+
+                if (tile === 'turret') {
+                    turrets.push({
+                        x: (colIdx + 0.5) * 100 / columns.length,
+                        y: (tileRows.length / 2 - (rowIdx + 0.5)) * 100 / columns.length
+                    });
+                }
+            }
+        });
+
+        purgeWall();
+    });
 
     walls.forEach(function (vertices) {
         var wallFixDef = new b2FixtureDef();
@@ -104,10 +124,9 @@ function Stage(soundscape, priorActionQueueList, onEnd) {
 
     this.anchor = this.world.CreateBody(anchorDef);
 
-    this.turrets = [
-        new Turret(this.world, this.soundscape, 30, -25),
-        new Turret(this.world, this.soundscape, 55, 25)
-    ];
+    this.turrets = turrets.map(function (turret) {
+        return new Turret(this.world, this.soundscape, turret.x, turret.y);
+    }, this);
 
     this.currentTick = 0;
 

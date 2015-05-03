@@ -3,14 +3,23 @@ var Box2D = require('box2dweb');
 
 var b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
 
-var M_TO_PX = 6.4;
+var TILE_WIDTH = 32;
+var TILE_HEIGHT = 32;
+
+var TILE_COLUMNS = 20;
+var TILE_ROWS = 16;
+
+var CANVAS_WIDTH = TILE_COLUMNS * TILE_WIDTH;
+var CANVAS_HEIGHT = TILE_ROWS * TILE_HEIGHT;
+
+var M_TO_PX = CANVAS_WIDTH / 100;
 
 function StageView(stage) {
     this.stage = stage;
 
     var debugDrawCanvas = document.createElement('canvas');
-    debugDrawCanvas.width = 640;
-    debugDrawCanvas.height = 480;
+    debugDrawCanvas.width = CANVAS_WIDTH;
+    debugDrawCanvas.height = CANVAS_HEIGHT;
     debugDrawCanvas.style.position = 'absolute';
     debugDrawCanvas.style.left = 0;
     debugDrawCanvas.style.top = 0;
@@ -63,7 +72,7 @@ function StageView(stage) {
 }
 
 StageView.prototype.render = function () {
-    this.debugDrawCanvasContext.clearRect(0, -240, 640, 240);
+    this.debugDrawCanvasContext.clearRect(0, -CANVAS_HEIGHT / 2, CANVAS_WIDTH, CANVAS_HEIGHT / 2);
     this.stage.world.DrawDebugData();
 };
 

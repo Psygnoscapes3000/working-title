@@ -16,6 +16,47 @@ var recordedActionQueueList = [];
 
 var soundscape = new Soundscape();
 
+var fs = require('fs');
+
+var canvas = document.createElement('canvas');
+var img = new Image();
+
+img.src = 'data:;base64,' + btoa(fs.readFileSync(__dirname + '/assets/stage-1.png', 'binary'));
+
+canvas.width = img.width;
+canvas.height = img.height;
+
+var ctx = canvas.getContext('2d');
+ctx.drawImage(img, 0, 0);
+
+var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+var rows = [],
+    columns = [],
+    rgb = 0;
+
+var hexToTile = {
+    '000000': 'earth',
+    '882200': 'wall',
+    '00ff00': 'safezone',
+    'ff0000': 'turret'
+};
+
+Array.prototype.forEach.call(imgData.data, function (component, idx) {
+    if ((idx & 3) === 3) {
+        var hex = ('00000' + rgb.toString(16)).substr(-6);
+        columns.push(hexToTile[hex]);
+        rgb = 0;
+
+        if (columns.length === canvas.width) {
+            rows.push(columns);
+            columns = [];
+        }
+    } else {
+        rgb = (rgb << 8) | component;
+    }
+});
+
 function restartStage() {
     if (view) {
         view.dispose();
@@ -24,7 +65,7 @@ function restartStage() {
     stage = new Stage(soundscape, recordedActionQueueList, function (recordedActionList) {
         recordedActionQueueList.push(recordedActionList);
         restartStage();
-    });
+    }, rows);
 
     view = new StageView(stage);
 }
