@@ -7,11 +7,12 @@ var b2BodyDef = Box2D.Dynamics.b2BodyDef;
 var b2FixtureDef = Box2D.Dynamics.b2FixtureDef;
 var b2CircleShape = Box2D.Collision.Shapes.b2CircleShape;
 
-function Turret(world, soundscape, x, y) {
+function Turret(world, soundscape, x, y, range) {
     this.world = world;
     this.soundscape = soundscape;
     this.x = x;
     this.y = y;
+    this.range = range;
     this.iCanHasTurret = true;
 
     this.cooldown = 0;
@@ -23,7 +24,7 @@ function Turret(world, soundscape, x, y) {
     bodyDef.position.y = y;
 
     var fixDef = new b2FixtureDef();
-    fixDef.shape = new b2CircleShape(20);
+    fixDef.shape = new b2CircleShape(this.range);
 
     this.markerBody = this.world.CreateBody(bodyDef);
     this.markerBody.CreateFixture(fixDef).SetSensor(true);

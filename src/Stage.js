@@ -171,7 +171,7 @@ function Stage(soundscape, priorActionQueueList) {
     this.anchor = this.world.CreateBody(anchorDef);
 
     this.turrets = turrets.map(function (turret) {
-        return new Turret(this.world, this.soundscape, turret.x, turret.y);
+        return new Turret(this.world, this.soundscape, turret.x, turret.y, 20);
     }, this);
 
     this.currentTick = 0;

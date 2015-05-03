@@ -71,7 +71,7 @@ function StageView(stage) {
 }
 
 StageView.prototype.render = function () {
-    this.ctx.clearRect(0, -CANVAS_HEIGHT / 2, CANVAS_WIDTH, CANVAS_HEIGHT / 2);
+    //this.ctx.clearRect(0, -CANVAS_HEIGHT / 2, CANVAS_WIDTH, CANVAS_HEIGHT / 2);
 
     var tileToHex = {
         'earth': '#000000',
@@ -94,6 +94,18 @@ StageView.prototype.render = function () {
         this.ctx.fill();
     }, this);
 
+    var rangeSegments = 100;
+    var rangeRotation = (Date.now() % 1000) / 1000 * (Math.PI * 2 / rangeSegments);
+
+    this.stage.turrets.forEach(function (turret) {
+        for (var i = 0; i < rangeSegments; i++) {
+            this.ctx.beginPath();
+            this.ctx.arc(turret.x * M_TO_PX, turret.y * M_TO_PX, turret.range * M_TO_PX, i * 2 * Math.PI / rangeSegments + rangeRotation, (i + 0.5) * 2 * Math.PI / rangeSegments + rangeRotation, false);
+            this.ctx.strokeStyle = '#888888';
+            this.ctx.stroke();
+        }
+    }, this);
+
     this.stage.critterList.forEach(function (critter) {
         var pos = critter.body.GetPosition();
 
@@ -103,7 +115,7 @@ StageView.prototype.render = function () {
         this.ctx.fill();
     }, this);
 
-    //this.stage.world.DrawDebugData();
+    // this.stage.world.DrawDebugData();
 };
 
 StageView.prototype.dispose = function () {
