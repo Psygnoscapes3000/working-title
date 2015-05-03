@@ -88,13 +88,23 @@ StageView.prototype.render = function () {
     }, this);
 
     this.stage.turrets.forEach(function (turret) {
+        var turretX = turret.x * M_TO_PX,
+            turretY = turret.y * M_TO_PX;
+
         this.ctx.beginPath();
-        this.ctx.arc(turret.x * M_TO_PX, turret.y * M_TO_PX, 10, 0, 2 * Math.PI, false);
+        this.ctx.arc(turretX, turretY, 10, 0, 2 * Math.PI, false);
         this.ctx.fillStyle = '#888888';
         this.ctx.fill();
+
+        this.ctx.beginPath();
+        this.ctx.moveTo(turretX, turretY);
+        this.ctx.lineTo(turretX + Math.cos(turret.angle) * 20, turretY + Math.sin(turret.angle) * 20);
+        this.ctx.lineWidth = 5;
+        this.ctx.strokeStyle = '#aaaaaa';
+        this.ctx.stroke();
     }, this);
 
-    var rangeSegments = 100;
+    var rangeSegments = 60;
     var rangeRotation = (Date.now() % 1000) / 1000 * (Math.PI * 2 / rangeSegments);
 
     this.stage.turrets.forEach(function (turret) {
@@ -102,6 +112,7 @@ StageView.prototype.render = function () {
             this.ctx.beginPath();
             this.ctx.arc(turret.x * M_TO_PX, turret.y * M_TO_PX, turret.range * M_TO_PX, i * 2 * Math.PI / rangeSegments + rangeRotation, (i + 0.5) * 2 * Math.PI / rangeSegments + rangeRotation, false);
             this.ctx.strokeStyle = '#888888';
+            this.ctx.lineWidth = 2;
             this.ctx.stroke();
         }
     }, this);
@@ -111,7 +122,7 @@ StageView.prototype.render = function () {
 
         this.ctx.beginPath();
         this.ctx.arc(pos.x * M_TO_PX, pos.y * M_TO_PX, 10, 0, 2 * Math.PI, false);
-        this.ctx.fillStyle = '#ffffff';
+        this.ctx.fillStyle = critter.health ? '#ffffff' : '#666';
         this.ctx.fill();
     }, this);
 

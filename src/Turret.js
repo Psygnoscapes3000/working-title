@@ -14,6 +14,7 @@ function Turret(world, soundscape, x, y, range) {
     this.y = y;
     this.range = range;
     this.iCanHasTurret = true;
+    this.angle = 0;
 
     this.cooldown = 0;
     this.targetStack = [];
@@ -48,8 +49,7 @@ Turret.prototype.fireOnTarget = function (target) {
     var tpos = target.body.GetPosition();
     var angle = Math.atan2(tpos.y - this.y, tpos.x - this.x);
 
-    // visual indication of hit direction
-    this.markerBody.SetAngle(angle);
+    this.angle = angle;
 
     this.soundscape.play('fire-cannon');
 
