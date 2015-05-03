@@ -15,6 +15,12 @@ var CANVAS_HEIGHT = TILE_ROWS * TILE_HEIGHT;
 
 var M_TO_PX = CANVAS_WIDTH / 100;
 
+var SRC_TILE_WIDTH = 16;
+var SRC_TILE_HEIGHT = 16;
+
+var SRC_TILE_COLUMNS = 21;
+var SRC_TILE_ROWS = 12;
+
 var tilesImg = new Image();
 
 tilesImg.src = 'data:image/png;base64,' + btoa(fs.readFileSync(__dirname + '/../assets/tiles.png', 'binary'));
@@ -45,7 +51,6 @@ function StageView(stage) {
 
     ctx.imageSmoothingEnabled = false;
     ctx.mozImageSmoothingEnabled = false;
-    ctx.webkitImageSmoothingEnabled = false;
 
     var debugDraw = new b2DebugDraw();
     debugDraw.SetSprite(ctx);
@@ -96,13 +101,60 @@ StageView.prototype.render = function () {
         'turret': '#ff0000'
     };
 
+    var neighbors = [
+        { x: 0, y: -1 },
+        { x: 1, y: 0 },
+        { x: 0, y: 1 },
+        { x: -1, y: 0 }
+    ];
+
     this.stage.rows.forEach(function (columns, rowIdx) {
         columns.forEach(function (tile, colIdx) {
-            this.ctx.fillStyle = tileToHex[tile];
+            var tileIdx;
 
-            if (tile === 'earth') {
-                this.ctx.drawImage(tilesCanvas, (5 + ((rowIdx ^ colIdx) % 12)) * 16, (12 - 1 - 7) * 16, 16, 16, colIdx * TILE_WIDTH, (this.stage.rows.length / 2 - rowIdx - 1) * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+            switch (tile) {
+            case 'earth':
+                tileIdx = 63 + ((rowIdx ^ colIdx) % 12);
+                break;
+            case 'wall':
+                var rows = this.stage.rows;
+
+                var neighSum = neighbors.reduce(function (sum, vec, idx) {
+                    var neighCol = colIdx + vec.x,
+                        neighRow = rowIdx + vec.y;
+
+                    if (
+                        neighCol < 0
+                        || neighCol === TILE_COLUMNS
+                        || neighRow < 0
+                        || neighRow === TILE_ROWS
+                        || rows[neighRow][neighCol] === tile
+                    ) {
+                        sum += 1 << idx;
+                    }
+
+                    return sum;
+                }, 0);
+
+                tileIdx = 0 + neighSum * 3 + ((rowIdx ^ colIdx) % 3);
+
+                break;
+            }
+
+            if (tileIdx >= 0) {
+                this.ctx.drawImage(
+                    tilesCanvas,
+                    (tileIdx % SRC_TILE_COLUMNS) * SRC_TILE_WIDTH,
+                    (SRC_TILE_ROWS - 1 - Math.floor(tileIdx / SRC_TILE_COLUMNS)) * SRC_TILE_HEIGHT,
+                    SRC_TILE_WIDTH,
+                    SRC_TILE_HEIGHT,
+                    colIdx * TILE_WIDTH,
+                    (this.stage.rows.length / 2 - rowIdx - 1) * TILE_HEIGHT,
+                    TILE_WIDTH,
+                    TILE_HEIGHT
+                );
             } else {
+                this.ctx.fillStyle = tileToHex[tile];
                 this.ctx.fillRect(colIdx * TILE_WIDTH, (this.stage.rows.length / 2 - rowIdx - 1) * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
             }
         }, this);
