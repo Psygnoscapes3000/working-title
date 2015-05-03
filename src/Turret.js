@@ -53,6 +53,10 @@ Turret.prototype.fireOnTarget = function (target) {
     this.soundscape.play('fire-cannon');
 
     target.takeDamage(angle);
+
+    if (target.health === 0) {
+        this.removeTarget(target);
+    }
 };
 
 Turret.prototype.advanceTime = function (elapsedSeconds) {
