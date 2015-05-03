@@ -16,9 +16,10 @@ var STEP_DURATION = 1 / 60.0;
 var Critter = require('./Critter.js');
 var Turret = require('./Turret.js');
 
-function Stage(priorActionQueueList, onEnd) {
+function Stage(soundscape, priorActionQueueList, onEnd) {
     this.timeAccumulator = 0;
     this.world = new b2World(new b2Vec2(0, 0), true);
+    this.soundscape = soundscape;
     this.onEnd = onEnd;
 
     var listener = {
@@ -104,8 +105,8 @@ function Stage(priorActionQueueList, onEnd) {
     this.anchor = this.world.CreateBody(anchorDef);
 
     this.turrets = [
-        new Turret(this.world, 30, -25),
-        new Turret(this.world, 55, 25)
+        new Turret(this.world, this.soundscape, 30, -25),
+        new Turret(this.world, this.soundscape, 55, 25)
     ];
 
     this.currentTick = 0;
@@ -114,12 +115,12 @@ function Stage(priorActionQueueList, onEnd) {
     this.actionQueueList = [];
     this.nextActionIndexList = [];
 
-    this.critterList.push(new Critter(this.world, this.anchor, 10 * priorActionQueueList.length, 0));
+    this.critterList.push(new Critter(this.world, this.soundscape, this.anchor, 10 * priorActionQueueList.length, 0));
     this.actionQueueList.push([]);
     this.nextActionIndexList.push(0);
 
     priorActionQueueList.forEach(function (list, i) {
-        this.critterList.push(new Critter(this.world, this.anchor, 10 * i, 0));
+        this.critterList.push(new Critter(this.world, this.soundscape, this.anchor, 10 * i, 0));
         this.actionQueueList.push(list);
         this.nextActionIndexList.push(0);
     }, this);

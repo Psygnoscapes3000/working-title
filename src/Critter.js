@@ -10,8 +10,9 @@ var b2MouseJointDef = Box2D.Dynamics.Joints.b2MouseJointDef;
 
 var MOVE_FORCE = 1500;
 
-function Critter(world, anchor, x, y) {
+function Critter(world, soundscape, anchor, x, y) {
     this.world = world;
+    this.soundscape = soundscape;
 
     var fixDef = new b2FixtureDef();
     fixDef.density = 1.0;
@@ -58,6 +59,10 @@ Critter.prototype.setupPhysicsStep = function () {
     } else {
         this.body.SetLinearDamping(20);
     }
+};
+
+Critter.prototype.takeDamage = function () {
+    this.soundscape.play(Math.random() < 0.5 ? 'impact-metal.1' : 'impact-metal.2');
 };
 
 module.exports = Critter;
