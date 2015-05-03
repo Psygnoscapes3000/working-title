@@ -125,22 +125,22 @@ function Stage(soundscape, priorActionQueueList) {
         }
 
         columns.forEach(function (tile, colIdx) {
-            if (tile === 'wall') {
+            switch (tile) {
+            case 'turret':
+                turrets.push({
+                    x: (colIdx + 0.5) * 100 / columns.length,
+                    y: (rows.length / 2 - (rowIdx + 0.5)) * 100 / columns.length
+                });
+            case 'wall':
                 if (wallLen) {
                     wallLen++;
                 } else {
                     wallStart = colIdx;
                     wallLen = 1;
                 }
-            } else {
+                break;
+            default:
                 purgeWall();
-
-                if (tile === 'turret') {
-                    turrets.push({
-                        x: (colIdx + 0.5) * 100 / columns.length,
-                        y: (rows.length / 2 - (rowIdx + 0.5)) * 100 / columns.length
-                    });
-                }
             }
         });
 
