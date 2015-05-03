@@ -61,7 +61,8 @@ Critter.prototype.setupPhysicsStep = function () {
     }
 };
 
-Critter.prototype.takeDamage = function () {
+Critter.prototype.takeDamage = function (impulse) {
+    this.body.ApplyImpulse(impulse, this.body.GetPosition());
     this.soundscape.play(Math.random() < 0.5 ? 'impact-metal.1' : 'impact-metal.2');
 };
 

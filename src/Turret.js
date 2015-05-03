@@ -59,10 +59,9 @@ Turret.prototype.fireOnTarget = function (target) {
     // visual indication of hit direction
     this.markerBody.SetAngle(angle);
 
-    target.body.ApplyImpulse(new b2Vec2(dx * HIT_IMPULSE, dy * HIT_IMPULSE), tpos);
-    target.takeDamage();
-
     this.soundscape.play('fire-cannon');
+
+    target.takeDamage(new b2Vec2(dx * HIT_IMPULSE, dy * HIT_IMPULSE));
 };
 
 Turret.prototype.advanceTime = function (elapsedSeconds) {
