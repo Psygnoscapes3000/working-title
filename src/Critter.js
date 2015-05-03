@@ -48,7 +48,7 @@ Critter.prototype.setTarget = function (x, y) {
 
 Critter.prototype.clearTarget = function () {
     if (this.health === 0) {
-        throw new Error('not alive');
+        return; // this may happen when recorded instructions are longer
     }
 };
 
