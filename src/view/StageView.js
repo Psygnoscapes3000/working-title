@@ -198,6 +198,26 @@ StageView.prototype.render = function () {
         this.ctx.fillStyle = critter.health > 0 ? (critter.isLive ? '#ff80c0' : '#ffffff') : '#888888';
         this.ctx.fill();
 
+        this.ctx.beginPath();
+        this.ctx.arc(critterX - 10, critterY + 2, 3, 0, 2 * Math.PI, false);
+        this.ctx.fillStyle = critter.health > 0 ? (critter.isLive ? '#ff80c0' : '#ffffff') : '#888888';
+        this.ctx.fill();
+
+        this.ctx.beginPath();
+        this.ctx.arc(critterX + 5, critterY + 9, 4, 0, 2 * Math.PI, false);
+        this.ctx.fillStyle = critter.health > 0 ? (critter.isLive ? '#ff80c0' : '#ffffff') : '#888888';
+        this.ctx.fill();
+
+        this.ctx.beginPath();
+        this.ctx.arc(critterX + 5, critterY + 3, 2, 0, 2 * Math.PI, false);
+        this.ctx.fillStyle = 'black';
+        this.ctx.fill();
+
+        this.ctx.beginPath();
+        this.ctx.arc(critterX - 1, critterY + 3, 2, 0, 2 * Math.PI, false);
+        this.ctx.fillStyle = 'black';
+        this.ctx.fill();
+
         if (critter.health > 0) {
             var healthBarX = critterX - HEALTH_BAR_WIDTH / 2,
                 healthBarY = critterY + HEALTH_BAR_DISTANCE;
